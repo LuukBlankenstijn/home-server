@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - infra/sealed-secrets
   - infra/cert-manager
+  - infra/flux
 
   - namespaces/vaultwarden.yaml
   - apps/vaultwarden

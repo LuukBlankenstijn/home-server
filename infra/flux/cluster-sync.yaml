@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster
+  namespace: flux-system
+spec:
+  interval: 1m
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-server-config
+  path: ./
+  wait: true
+  timeout: 2m
+  healthCheckExprs:
+  - apiVersion: bitnami.com/v1alpha1
+    kind: SealedSecret
+    failed: status.conditions.filter(e, e.type == 'Synced').all(e, e.status == 'False')
+    current: status.conditions.filter(e, e.type == 'Synced').all(e, e.status == 'True')
