@@ -18,9 +18,8 @@ ingress:
   enabled: true
   ingressClassName: traefik
   hosts:
-    - host: sonar.luukblankenstijn.nl
-      paths:
-        - /
+    - name: sonar.luukblankenstijn.nl
+      paths: /
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
   tls:
