@@ -1,5 +1,8 @@
 edition: community
 
+monitoringPasscodeSecretName: sonarqube-monitoring
+monitoringPasscodeSecretKey: passcode
+
 postgresql:
   enabled: true
 

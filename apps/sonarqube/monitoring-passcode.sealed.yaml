@@ -1,0 +1,15 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: sonarqube-monitoring
+  namespace: sonarqube
+spec:
+  encryptedData:
+    passcode: AgAUU07t/6nvLAoOnz4BzpTwux0MYUQ3ZTbynuHRvd3+K7QeRqE//j7Hnq+KA7/vJXkgmPamZfZYvb6iLmIAjiSlToSKhsC9P3WQUncgG5xyI/bh5sA+RM0ZmF2NnDlT13dPbNKAACjh7wpFcd38Q7aaGQBGa0gEUQ2V9UiyInbrjUf+IWTB7tQ6OBNYsG1M8cBf7iCOku5N/51yLkPJnaV93l2zWqDFRVM1Dr6t2sk+Zrd6sd/6gO3dC5UlspBmI9uD+mapcGdnwR58xdzfexH4dKAOLpYM13PB2SEik66huwVZZ8PEg87JR5MstFYcMjPieMs3A3YFhna5IMxumqpVUXFQuu8iOr5pTnhxUG2/DicvDnTQzK1AQSqEfLzdCiqDFqhm+SqO0bquANkqx85vfJwh1kpliyBk65BocQzNfwRIkUD12hNKGZgFBH1qV2lpKwblHj/Je3rl4V0/wai7srjIA9aiKWmcJiCsbQHB/lEmNGEKc32XU7f3fZJx5jhvIh9+aveRpuJAxJUSOs9qGTw3qWrwCTsZYEGGoWN6yyX69c6T0kLb4LUIvS0JhFJUpeexEkQP3L1uWM003H2k5whTOOw/dwl9jMtdeJdyF9C52Y7UWhuj4jHCNVqj6GQk0/Lw4WAXs1pL7Jxsq7Bgp1aeeL/0q01MyAloxuqSKKHX4Gt83gEacEeqVDD+Zj2Q154HsvX71kTKowCcMqnzCYSHQx7CsHakw16i/t0=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: sonarqube-monitoring
+      namespace: sonarqube
