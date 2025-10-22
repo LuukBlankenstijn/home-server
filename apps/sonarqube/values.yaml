@@ -23,7 +23,7 @@ ingress:
         - path: /
           pathType: Prefix
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
+    cert-manager.io/cluster-issuer: letsencrypt-dns
   tls:
     - secretName: sonarqube-tls
       hosts:
