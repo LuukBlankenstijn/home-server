@@ -1,0 +1,38 @@
+community:
+  enabled: true
+
+monitoringPasscodeSecretName: sonarqube-monitoring
+monitoringPasscodeSecretKey: passcode
+
+postgresql:
+  enabled: true
+
+service:
+  type: ClusterIP
+
+persistence:
+  enabled: true
+  size: 20Gi
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - name: sonar.luukblankenstijn.nl
+      paths:
+        - path: /
+          pathType: Prefix
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-dns
+  tls:
+    - secretName: sonarqube-tls
+      hosts:
+        - sonar.luukblankenstijn.nl
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "2Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
