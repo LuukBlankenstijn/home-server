@@ -1,0 +1,33 @@
+edition: community
+
+postgresql:
+  enabled: true
+
+service:
+  type: ClusterIP
+
+persistence:
+  enabled: true
+  size: 20Gi
+
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: sonar.luukblankenstijn.nl
+      paths:
+        - /
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  tls:
+    - secretName: sonarqube-tls
+      hosts:
+        - sonar.luukblankenstijn.nl
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "2Gi"
+  limits:
+    cpu: "2"
+    memory: "4Gi"
