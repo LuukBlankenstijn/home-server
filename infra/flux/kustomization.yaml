@@ -5,4 +5,4 @@ resources:
 
   - git-repo.yaml
   - cluster-sync.yaml
-  - helm-repos
+  - helm-repos/sonarqube.yaml
