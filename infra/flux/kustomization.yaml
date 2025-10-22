@@ -5,3 +5,4 @@ resources:
 
   - git-repo.yaml
   - cluster-sync.yaml
+  - helm-repos

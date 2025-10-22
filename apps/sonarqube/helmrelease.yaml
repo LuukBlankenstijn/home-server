@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: sonarqube
-      version: ">=2025.0.0-0"
+      version: "25.10.0.114319"
       sourceRef:
         kind: HelmRepository
         name: sonarsource
