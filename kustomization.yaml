@@ -5,5 +5,8 @@ resources:
   - infra/cert-manager
   - infra/flux
 
+  - namespaces/sonarqube.yaml
+  - apps/sonarqube
+
   - namespaces/vaultwarden.yaml
   - apps/vaultwarden
