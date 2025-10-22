@@ -14,3 +14,4 @@ generatorOptions:
 resources:
   - helmrelease.yaml
   - monitoring-passcode.sealed.yaml
+  - cert.yaml
