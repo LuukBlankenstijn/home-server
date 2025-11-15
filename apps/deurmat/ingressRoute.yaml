@@ -1,0 +1,25 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: deurmat
+  namespace: deurmat
+spec:
+  entryPoints:
+    - websecure
+  tls:
+    secretName: deurmat-tls
+  routes:
+    - match: Host(`deurmat.luukblankenstijn.nl`) && PathPrefix(`/`)
+      kind: Rule
+      middlewares:
+        - name: basicauth
+      services:
+        - name: frontend
+          port: 80
+    - match: Host(`deurmat.luukblankenstijn.nl`) && PathPrefix(`/api`)
+      kind: Rule
+      middlewares:
+        - name: basicauth
+      services:
+        - name: backend
+          port: 8080
