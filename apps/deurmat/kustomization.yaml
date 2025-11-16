@@ -10,5 +10,8 @@ resources:
   - authMiddleware.yaml
   - user-secret-sealed.yaml
   - ghcr-pull-sealed.yaml
-commonLabels:
-  app.kubernetes.io/part-of: deurmat
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: deurmat

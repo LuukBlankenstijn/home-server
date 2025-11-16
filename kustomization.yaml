@@ -11,5 +11,5 @@ resources:
   - namespaces/vaultwarden.yaml
   - apps/vaultwarden
 
-  - namespace/deurmat.yaml
+  - namespaces/deurmat.yaml
   - apps/deurmat
