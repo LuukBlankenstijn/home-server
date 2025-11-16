@@ -19,18 +19,6 @@ stringData:
   POSTGRES_PORT: "5432"
   POSTGRES_HOST: postgres.deurmat.svc.cluster.local
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: backend-env
-  namespace: deurmat
-type: Opaque
-stringData:
-  PORT: "8080"
-  JWT_SECRET: "ditiseensecretkeythatshouldbeverylong"
-  ADMIN_EMAIL: "admin@deurmat.local"
-  ADMIN_PASSWORD: "DryGigabyte6Senate"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

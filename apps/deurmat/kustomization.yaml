@@ -10,6 +10,7 @@ resources:
   - authMiddleware.yaml
   - user-secret-sealed.yaml
   - ghcr-pull-sealed.yaml
+  - backend-env-sealed.yaml
 
 labels:
   - includeSelectors: true
