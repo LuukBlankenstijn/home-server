@@ -4,6 +4,7 @@ resources:
   - infra/sealed-secrets
   - infra/cert-manager
   - infra/flux
+  - infra/actions-runner-controller
 
   - namespaces/sonarqube.yaml
   - apps/sonarqube
@@ -13,3 +14,5 @@ resources:
 
   - namespaces/deurmat.yaml
   - apps/deurmat
+
+  - namespaces/arc-system.yaml
