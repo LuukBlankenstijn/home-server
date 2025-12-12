@@ -14,5 +14,3 @@ resources:
 
   - namespaces/deurmat.yaml
   - apps/deurmat
-
-  - namespaces/arc-system.yaml

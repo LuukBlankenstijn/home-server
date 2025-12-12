@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-runners
+  namespace: github-runners
+spec:
+  interval: 5m
+  releaseName: github-runners
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller
+        namespace: flux-system
+      version: "*"
+  values:
+    githubConfigUrl: "https://github.com/LuukBlankenstijn/deurmat"
+
+    githubConfigSecret: github-runners-config
+
+    runnerScaleSetName: "k3s-runners"
+
+    minRunners: 4
+    maxRunners: 4
+
+    containerMode:
+      type: "dind"
