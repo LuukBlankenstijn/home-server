@@ -18,6 +18,7 @@ stringData:
   POSTGRES_PASSWORD: deurmat
   POSTGRES_PORT: "5432"
   POSTGRES_HOST: postgres.deurmat.svc.cluster.local
+  ALLOW_UNSAFE_LOGIN: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -109,7 +110,7 @@ spec:
         - name: ghcr-pull
       containers:
         - name: frontend
-          image: ghcr.io/luukblankenstijn/deurmat/frontend:latest
+          image: ghcr.io/luukblankenstijn/deurmat/frontend:dev
           imagePullPolicy: Always
           ports:
             - containerPort: 80
