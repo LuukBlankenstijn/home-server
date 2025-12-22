@@ -14,3 +14,6 @@ resources:
 
   - namespaces/deurmat.yaml
   - apps/deurmat
+  
+  - namespaces/authentik.yaml
+  - apps/authentik

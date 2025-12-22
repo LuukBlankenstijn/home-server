@@ -1,0 +1,47 @@
+authentik:
+  enabled: true
+  web:
+    path: /
+  postgresql:
+    host: authentik-authentik-postgresql.authentik.svc.cluster.local
+    user: file:///postgres-creds/username
+    password: file:///postgres-creds/password
+
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    hosts:
+      - auth.luukblankenstijn.nl
+    tls:
+      - secretName: authentik-tls
+        hosts:
+          - auth.luukblankenstijn.nl
+  volumes:
+    - name: postgres-creds
+      secret:
+        secretName: authentik-postgres-credentials
+  volumeMounts:
+    - name: postgres-creds
+      mountPath: /postgres-creds
+      readOnly: true
+
+worker:
+  volumes:
+    - name: postgres-creds
+      secret:
+        secretName: authentik-postgres-credentials
+  volumeMounts:
+    - name: postgres-creds
+      mountPath: /postgres-creds
+      readOnly: true
+
+postgresql:
+  enabled: true
+  auth:
+    username: authentik
+    database: authentik
+    existingSecret: authentik-postgres-credentials
