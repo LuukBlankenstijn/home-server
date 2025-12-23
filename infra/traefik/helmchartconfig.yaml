@@ -9,3 +9,6 @@ spec:
       default:
         defaultCertificate:
           secretName: wildcard-luukblankenstijn-nl-tls
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true

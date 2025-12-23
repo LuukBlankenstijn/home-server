@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ephemera
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: ephemera }
+  template:
+    metadata:
+      labels: { app: ephemera }
+    spec:
+      initContainers:
+        - name: wait-for-flaresolverr
+          image: busybox:1.36
+          command: ["sh", "-c", "until nc -z flaresolverr 8191; do sleep 2; done"]
+      containers:
+        - name: ephemera
+          image: ghcr.io/orwellianepilogue/ephemera:latest
+          ports:
+            - containerPort: 8286
+          envFrom:
+            - secretRef:
+                name: ephemera-env
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: downloads
+              mountPath: /app/downloads
+            - name: ingest
+              mountPath: /app/ingest
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8286
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8286
+            initialDelaySeconds: 30
+            periodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: ephemera-data
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: ephemera-downloads
+        - name: ingest
+          persistentVolumeClaim:
+            claimName: ephemera-ingest
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flaresolverr
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: flaresolverr }
+  template:
+    metadata:
+      labels: { app: flaresolverr }
+    spec:
+      containers:
+        - name: flaresolverr
+          image: ghcr.io/flaresolverr/flaresolverr:latest
+          ports:
+            - containerPort: 8191
+          env:
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_HTML
+              value: "false"
+            - name: CAPTCHA_SOLVER
+              value: "none"
+            - name: TZ
+              value: "Europe/Amsterdam"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8191
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8191
+            initialDelaySeconds: 30
+            periodSeconds: 30

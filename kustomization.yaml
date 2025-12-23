@@ -21,3 +21,6 @@ resources:
 
   - namespaces/booklore.yaml
   - apps/booklore
+
+  - namespaces/ephemera.yaml
+  - apps/ephemera
