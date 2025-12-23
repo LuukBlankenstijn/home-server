@@ -1,0 +1,11 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: booklore-buffer
+  namespace: booklore
+spec:
+  buffering:
+    memRequestBodyBytes: 262144
+    memResponseBodyBytes: 262144
+    maxRequestBodyBytes: 104857600
+    maxResponseBodyBytes: 104857600

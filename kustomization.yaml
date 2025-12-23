@@ -18,3 +18,6 @@ resources:
   
   - namespaces/authentik.yaml
   - apps/authentik
+
+  - namespaces/booklore.yaml
+  - apps/booklore

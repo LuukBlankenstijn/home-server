@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booklore
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: booklore }
+  template:
+    metadata:
+      labels: { app: booklore }
+    spec:
+      initContainers:
+        - name: wait-for-mariadb
+          image: busybox:1.36
+          command: ["sh", "-c", "until nc -z mariadb 3306; do sleep 2; done"]
+      containers:
+        - name: booklore
+          image: booklore/booklore:latest
+          ports:
+            - containerPort: 6060
+          envFrom:
+            - secretRef:
+                name: booklore-env
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: books
+              mountPath: /books
+            - name: bookdrop
+              mountPath: /bookdrop
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: booklore-data
+        - name: books
+          persistentVolumeClaim:
+            claimName: booklore-books
+        - name: bookdrop
+          emptyDir: {}

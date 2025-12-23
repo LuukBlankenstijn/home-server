@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: booklore
+  namespace: booklore
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`booklore.luukblankenstijn.nl`) && PathPrefix(`/`)
+      kind: Rule
+      middlewares:
+        - name: booklore-buffer
+      services:
+        - name: booklore
+          namespace: booklore
+          port: 6060
