@@ -54,12 +54,6 @@ ingress:
     - name: sonar.luukblankenstijn.nl
       path: /
       pathType: ImplementationSpecific
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  tls:
-    - secretName: sonarqube-tls
-      hosts:
-        - sonar.luukblankenstijn.nl
 
 resources:
   requests:

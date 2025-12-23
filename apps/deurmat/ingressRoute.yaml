@@ -6,8 +6,6 @@ metadata:
 spec:
   entryPoints:
     - websecure
-  tls:
-    secretName: deurmat-tls
   routes:
     - match: Host(`deurmat.luukblankenstijn.nl`) && PathPrefix(`/`)
       kind: Rule

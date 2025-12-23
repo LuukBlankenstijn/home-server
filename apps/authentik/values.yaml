@@ -16,10 +16,6 @@ server:
       traefik.ingress.kubernetes.io/router.tls: "true"
     hosts:
       - auth.luukblankenstijn.nl
-    tls:
-      - secretName: authentik-tls
-        hosts:
-          - auth.luukblankenstijn.nl
   volumes:
     - name: postgres-creds
       secret:

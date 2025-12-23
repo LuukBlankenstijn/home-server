@@ -7,10 +7,6 @@ metadata:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
 spec:
-  tls:
-    - hosts:
-        - vaultwarden.example.com
-      secretName: vaultwarden-tls
   rules:
     - host: vaultwarden.luukblankenstijn.nl
       http:

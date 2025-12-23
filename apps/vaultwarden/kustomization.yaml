@@ -6,7 +6,6 @@ resources:
   - deploy.yaml
   - svc.yaml
   - ingress.yaml
-  - cert.yaml
 
 labels:
   - includeSelectors: true
