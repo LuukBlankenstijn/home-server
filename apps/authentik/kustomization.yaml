@@ -3,16 +3,8 @@ kind: Kustomization
 
 namespace: authentik
 
-configMapGenerator:
-  - name: authentik-values
-    namespace: authentik
-    files:
-      - values.yaml
-
-generatorOptions:
-  disableNameSuffixHash: true
-
 resources:
   - helmrelease.yaml
   - authentik-sealedsecret.yaml
   - authentik-postgres-sealedsecret.yaml
+  - authentik-email-password-sealedsecret.yaml
