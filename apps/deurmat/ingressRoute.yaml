@@ -9,15 +9,15 @@ spec:
   routes:
     - match: Host(`deurmat.luukblankenstijn.nl`) && PathPrefix(`/`)
       kind: Rule
-      middlewares:
-        - name: basicauth
+#      middlewares:
+#        - name: basicauth
       services:
         - name: frontend
           port: 80
     - match: Host(`deurmat.luukblankenstijn.nl`) && PathPrefix(`/api`)
       kind: Rule
-      middlewares:
-        - name: basicauth
+#      middlewares:
+#        - name: basicauth
       services:
         - name: backend
           port: 8080

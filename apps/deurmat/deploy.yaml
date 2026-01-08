@@ -110,7 +110,7 @@ spec:
         - name: ghcr-pull
       containers:
         - name: frontend
-          image: ghcr.io/luukblankenstijn/deurmat/frontend:dev
+          image: ghcr.io/luukblankenstijn/deurmat/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
