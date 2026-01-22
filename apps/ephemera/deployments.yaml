@@ -13,10 +13,12 @@ spec:
       initContainers:
         - name: wait-for-flaresolverr
           image: busybox:1.36
-          command: ["sh", "-c", "until nc -z flaresolverr 8191; do sleep 2; done"]
+          command:
+            ["sh", "-c", "until nc -z flaresolverr 8191; do sleep 2; done"]
       containers:
         - name: ephemera
           image: ghcr.io/orwellianepilogue/ephemera:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8286
           envFrom:
