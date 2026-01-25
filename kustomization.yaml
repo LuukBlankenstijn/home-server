@@ -22,5 +22,5 @@ resources:
   - namespaces/booklore.yaml
   - apps/booklore
 
-  - namespaces/ephemera.yaml
-  - apps/ephemera
+  - namespaces/shelfmark.yaml
+  - apps/shelfmark

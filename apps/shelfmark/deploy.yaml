@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shelfmark
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: shelfmark }
+  template:
+    metadata:
+      labels: { app: shelfmark }
+    spec:
+      containers:
+        - name: shelfmark
+          image: ghcr.io/calibrain/shelfmark:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+          volumeMounts:
+            - name: books
+              mountPath: /books
+            - name: config
+              mountPath: /config
+            - name: downloads
+              mountPath: /downloads
+      volumes:
+        - name: books
+          persistentVolumeClaim:
+            claimName: shelfmark-books
+        - name: config
+          persistentVolumeClaim:
+            claimName: shelfmark-config
+        - name: downloads
+          persistentVolumeClaim:
+            claimName: shelfmark-downloads
