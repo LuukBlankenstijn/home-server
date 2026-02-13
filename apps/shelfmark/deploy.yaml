@@ -21,6 +21,13 @@ spec:
               value: "1000"
             - name: PGID
               value: "1000"
+            - name: USING_TOR
+              value: "true"
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - NET_RAW
           volumeMounts:
             - name: books
               mountPath: /books
