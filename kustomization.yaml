@@ -24,3 +24,6 @@ resources:
 
   - namespaces/shelfmark.yaml
   - apps/shelfmark
+
+  - namespaces/hytale.yaml
+  - apps/hytale

@@ -1,0 +1,16 @@
+workload:
+  kind: StatefulSet
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+service:
+  type: ClusterIP
+
+tty: true
+stdin: true
+
+env:
+  HYTALE_AUTO_DOWNLOAD: "true"
+  HYTALE_AUTO_UPDATE: "true"

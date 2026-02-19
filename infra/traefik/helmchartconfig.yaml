@@ -12,3 +12,10 @@ spec:
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
+    ports:
+      hytale-udp:
+        port: 5520
+        exposedPort: 5520
+        protocol: UDP
+        expose:
+          default: true

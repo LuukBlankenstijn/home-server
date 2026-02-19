@@ -1,0 +1,19 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: hytale
+  namespace: hytale
+spec:
+  interval: 30m
+  targetNamespace: hytale
+  chart:
+    spec:
+      chart: hytale-server
+      sourceRef:
+        kind: HelmRepository
+        name: hybrowse
+        namespace: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: hytale-values
+      valuesKey: values.yaml

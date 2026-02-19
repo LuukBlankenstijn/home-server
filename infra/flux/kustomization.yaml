@@ -7,3 +7,4 @@ resources:
   - cluster-sync.yaml
   - helm-repos/sonarqube.yaml
   - helm-repos/authentik.yaml
+  - helm-repos/hytale.yaml
