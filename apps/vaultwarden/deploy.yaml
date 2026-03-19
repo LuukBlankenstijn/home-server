@@ -17,7 +17,7 @@ spec:
             - containerPort: 80
           env:
             - name: DOMAIN
-              value: "http://vaultwarden.luukblankenstijn.nl"
+              value: "https://vaultwarden.luukblankenstijn.nl"
             - name: SIGNUPS_ALLOWED
               value: "false"
           volumeMounts:
@@ -27,4 +27,3 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: vaultwarden-data
-
