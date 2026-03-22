@@ -13,7 +13,7 @@ spec:
       containers:
         - name: shelfmark
           image: ghcr.io/calibrain/shelfmark:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8084
           env:
