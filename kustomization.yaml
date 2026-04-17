@@ -5,17 +5,10 @@ resources:
   - infra/cert-manager
   - infra/traefik
   - infra/flux
-  - infra/actions-runner-controller
-
-  - namespaces/sonarqube.yaml
-  - apps/sonarqube
 
   - namespaces/vaultwarden.yaml
   - apps/vaultwarden
 
-  - namespaces/deurmat.yaml
-  - apps/deurmat
-  
   - namespaces/authentik.yaml
   - apps/authentik
 
