@@ -19,8 +19,7 @@ resources:
   - namespaces/authentik.yaml
   - apps/authentik
 
-  - namespaces/booklore.yaml
-  - apps/booklore
+  - apps/grimmory
 
   - namespaces/shelfmark.yaml
   - apps/shelfmark

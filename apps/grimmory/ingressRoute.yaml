@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grimmory
+  namespace: grimmory
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`grimmory.luukblankenstijn.nl`) && PathPrefix(`/`)
+      kind: Rule
+      middlewares:
+        - name: grimmory-buffer
+      services:
+        - name: grimmory
+          namespace: grimmory
+          port: 6060

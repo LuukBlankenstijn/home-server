@@ -1,8 +1,8 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: booklore-buffer
-  namespace: booklore
+  name: grimmory-buffer
+  namespace: grimmory
 spec:
   buffering:
     memRequestBodyBytes: 262144
