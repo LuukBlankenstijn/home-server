@@ -12,5 +12,7 @@ generatorOptions:
   disableNameSuffixHash: true
 
 resources:
+  - namespace.yaml
+  - helm-repo.yaml
   - helmrelease.yaml
   - ingressRouteUDP.yaml
