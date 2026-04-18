@@ -13,14 +13,12 @@ spec:
     spec:
       containers:
         - name: vaultwarden
-          image: vaultwarden/server:latest
+          image: vaultwarden/server:1.35.7
           ports:
             - containerPort: 80
-          env:
-            - name: DOMAIN
-              value: "https://vaultwarden.luukblankenstijn.nl"
-            - name: SIGNUPS_ALLOWED
-              value: "false"
+          envFrom:
+            - secretRef:
+                name: config
           volumeMounts:
             - name: data
               mountPath: /data
