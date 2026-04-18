@@ -17,7 +17,7 @@ spec:
           command: ["sh", "-c", "until nc -z mariadb 3306; do sleep 2; done"]
       containers:
         - name: grimmory
-          image: grimmory/grimmory:latest
+          image: grimmory/grimmory:v2.3.0
           ports:
             - containerPort: 6060
           envFrom:
