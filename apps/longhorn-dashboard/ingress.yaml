@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: longhorn-frontend
+  namespace: longhorn-system
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`longhorn.luukblankenstijn.nl`)
+      middlewares:
+        - name: proxy-auth
+          namespace: authentik
+      services:
+        - name: longhorn-frontend
+          port: 80
