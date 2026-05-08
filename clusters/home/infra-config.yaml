@@ -13,8 +13,3 @@ spec:
     name: flux-system
   dependsOn:
     - name: infrastructure
-  healthCheckExprs:
-    - apiVersion: bitnami.com/v1alpha1
-      kind: SealedSecret
-      failed: status.conditions.filter(e, e.type == 'Synced').all(e, e.status == 'False')
-      current: status.conditions.filter(e, e.type == 'Synced').all(e, e.status == 'True')
