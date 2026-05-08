@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: wildcard-luukblankenstijn-nl
-  namespace: kube-system
+  namespace: traefik
 spec:
   secretName: wildcard-luukblankenstijn-nl-tls
   issuerRef:
@@ -10,4 +10,4 @@ spec:
     name: letsencrypt-dns
   dnsNames:
     - luukblankenstijn.nl
-    - '*.luukblankenstijn.nl'
+    - "*.luukblankenstijn.nl"

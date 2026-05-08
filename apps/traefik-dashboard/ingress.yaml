@@ -1,17 +1,17 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: shelfmark
-  namespace: shelfmark
+  name: traefik-dashboard
+  namespace: traefik
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`shelfmark.luukblankenstijn.nl`) && PathPrefix(`/`)
+    - kind: Rule
+      match: Host(`traefik.luukblankenstijn.nl`)
       middlewares:
         - name: proxy-auth
           namespace: authentik
-      kind: Rule
       services:
-        - name: shelfmark
-          port: 8084
+        - name: api@internal
+          kind: TraefikService

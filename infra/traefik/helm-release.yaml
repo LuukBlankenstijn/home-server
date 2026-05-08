@@ -1,0 +1,62 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  targetNamespace: traefik
+  storageNamespace: traefik
+  chart:
+    spec:
+      chart: traefik
+      version: "39.0.8"
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+  interval: 1h
+  install:
+    createNamespace: true
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    deployment:
+      kind: DaemonSet
+    service:
+      spec:
+        externalTrafficPolicy: Local
+    ingressClass:
+      enabled: true
+      isDefaultClass: true
+      name: traefik
+    ports:
+      web:
+        http:
+          redirections:
+            entryPoint:
+              to: websecure
+              scheme: https
+              permanent: true
+      websecure:
+        asDefault: true
+      hytale-udp:
+        port: 5520
+        exposedPort: 5520
+        protocol: UDP
+        expose:
+          default: true
+    logs:
+      access:
+        enabled: true
+        format: "json"
+    providers:
+      kubernetesGateway:
+        enabled: true
+      kubernetesCRD:
+        allowCrossNamespace: true
+    tlsStore:
+      default:
+        defaultCertificate:
+          secretName: wildcard-luukblankenstijn-nl-tls
