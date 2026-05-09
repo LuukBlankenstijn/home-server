@@ -1,0 +1,23 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+  namespace: cnpg
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  enableSuperuserAccess: true
+
+  inheritedMetadata:
+    labels:
+      recurring-job.longhorn.io/source: enabled
+      recurring-job.longhorn.io/fs-trim: enabled
+
+  storage:
+    size: 20Gi
+
+  backup:
+    volumeSnapshot:
+      className: longhorn-backup-vsc
+      snapshotOwnerReference: backup
+      online: true
