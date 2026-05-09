@@ -1,0 +1,6 @@
+apiVersion: databases.luukblankenstijn.nl/v1alpha1
+kind: PostgresDatabase
+metadata:
+  name: database
+  namespace: vaultwarden
+spec: {}
