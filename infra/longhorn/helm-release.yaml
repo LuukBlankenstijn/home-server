@@ -30,3 +30,5 @@ spec:
       nodeDownPodDeletionPolicy: "delete-both-statefulset-and-deployment-pod"
       concurrentAutomaticEngineUpgradePerNodeLimit: 3
       orphanAutoDeletion: false
+    persistence:
+      defaultClassReplicaCount: 1
