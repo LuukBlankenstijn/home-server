@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: mariadb
-          image: lscr.io/linuxserver/mariadb:11.4.5
+          image: lscr.io/linuxserver/mariadb:11.4.10
           ports:
             - containerPort: 3306
           envFrom:
