@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: garage-operator
-      version: "0.5.8"
+      version: "0.5.10"
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
