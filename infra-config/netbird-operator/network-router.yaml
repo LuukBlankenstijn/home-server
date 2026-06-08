@@ -5,6 +5,6 @@ metadata:
   namespace: netbird
 spec:
   dnsZoneRef:
-    name: home
+    name: home.luuk
   workloadOverride:
     replicas: 1
