@@ -6,3 +6,5 @@ metadata:
 spec:
   dnsZoneRef:
     name: home
+  workloadOverride:
+    replicas: 1
