@@ -1,0 +1,55 @@
+apiVersion: netbird.io/v1alpha1
+kind: ClusterProxy
+metadata:
+  name: home
+  namespace: netbird
+spec:
+  clusterName: home
+  serviceAccountName: clusterproxy-home
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: clusterproxy-home
+  namespace: netbird
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: clusterproxy-home
+rules:
+  - apiGroups: [""]
+    resources: ["users", "groups"]
+    verbs: ["impersonate"]
+  - apiGroups: ["authentication.k8s.io"]
+    resources: ["userextras/*", "uids"]
+    verbs: ["impersonate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: clusterproxy-home
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: clusterproxy-home
+subjects:
+  - kind: ServiceAccount
+    name: clusterproxy-home
+    namespace: netbird
+---
+# Anyone in the "netbird-admins" netbird group gets cluster-admin when
+# they hit the kube API through the proxy. Manage membership of this
+# group in the NetBird dashboard.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: netbird-admins
+subjects:
+  - kind: Group
+    name: netbird-admins
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io
