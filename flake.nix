@@ -22,6 +22,8 @@
           packages = [
             pkgs.kubeseal
             pkgs.kustomize
+            pkgs.kubectl
+            pkgs.k9s
           ];
         };
       }
