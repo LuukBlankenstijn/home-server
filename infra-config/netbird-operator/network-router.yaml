@@ -1,0 +1,8 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkRouter
+metadata:
+  name: home
+  namespace: netbird
+spec:
+  dnsZoneRef:
+    name: home

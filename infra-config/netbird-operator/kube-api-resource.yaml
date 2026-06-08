@@ -1,0 +1,13 @@
+apiVersion: netbird.io/v1alpha1
+kind: NetworkResource
+metadata:
+  name: kubernetes
+  namespace: default
+spec:
+  networkRouterRef:
+    name: home
+    namespace: netbird
+  serviceRef:
+    name: kubernetes
+  groups:
+    - name: admins
