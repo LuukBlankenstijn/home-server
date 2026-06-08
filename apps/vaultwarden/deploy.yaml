@@ -19,11 +19,19 @@ spec:
           envFrom:
             - secretRef:
                 name: config
-            - secretRef:
-                name: db-vaultwarden-credentials
           env:
+            - name: PG_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: vaultwarden-pg-creds
+                  key: username
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vaultwarden-pg-creds
+                  key: password
             - name: DATABASE_URL
-              value: "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=require"
+              value: "postgresql://$(PG_USERNAME):$(PG_PASSWORD)@postgres-rw.cnpg.svc.cluster.local:5432/vaultwarden"
           volumeMounts:
             - name: data
               mountPath: /data
