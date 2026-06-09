@@ -24,6 +24,7 @@
             pkgs.kustomize
             pkgs.kubectl
             pkgs.k9s
+            pkgs.fluxcd
           ];
         };
       }
