@@ -5,15 +5,8 @@
 # DNS name via extraDNSLabels, and forwards traffic into the pod's loopback,
 # so port 11434 on the mesh peer reaches Ollama on the same pod.
 #
-# No ingress, no LoadBalancer; reachable only from peers in the `ollama` group.
----
-apiVersion: netbird.io/v1alpha1
-kind: Group
-metadata:
-  name: ollama
-  namespace: ollama
-spec:
-  name: ollama
+# No ingress, no LoadBalancer; the `ollama` NetBird group + access policy
+# granting your peers reach to it are defined elsewhere.
 ---
 apiVersion: netbird.io/v1alpha1
 kind: SetupKey
@@ -25,8 +18,8 @@ spec:
   # Ephemeral peers are cleaned up on pod termination; avoids zombie peers
   # accumulating in the NetBird account every time the deployment rolls.
   ephemeral: true
-  # Required so the sidecar can register the extraDNSLabels below.
   allowExtraDnsLabels: true
+  # NetBird group is created + policy-bound elsewhere; reference by name.
   autoGroups:
     - name: ollama
 ---
