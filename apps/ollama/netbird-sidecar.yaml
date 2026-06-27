@@ -1,0 +1,46 @@
+# NetBird-only exposure for the Ollama API.
+#
+# The netbird-operator injects a netbird client sidecar into pods matching the
+# SidecarProfile's podSelector. The sidecar joins the NetBird mesh, registers a
+# DNS name via extraDNSLabels, and forwards traffic into the pod's loopback,
+# so port 11434 on the mesh peer reaches Ollama on the same pod.
+#
+# No ingress, no LoadBalancer; reachable only from peers in the `ollama` group.
+---
+apiVersion: netbird.io/v1alpha1
+kind: Group
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  name: ollama
+---
+apiVersion: netbird.io/v1alpha1
+kind: SetupKey
+metadata:
+  name: ollama-sidecar
+  namespace: ollama
+spec:
+  name: ollama-sidecar
+  # Ephemeral peers are cleaned up on pod termination; avoids zombie peers
+  # accumulating in the NetBird account every time the deployment rolls.
+  ephemeral: true
+  # Required so the sidecar can register the extraDNSLabels below.
+  allowExtraDnsLabels: true
+  autoGroups:
+    - name: ollama
+---
+apiVersion: netbird.io/v1alpha1
+kind: SidecarProfile
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  setupKeyRef:
+    name: ollama-sidecar
+  podSelector:
+    matchLabels:
+      netbird-peer: ollama
+  # Reachable on the mesh as `ollama.<netbird-domain>:11434`.
+  extraDNSLabels:
+    - ollama

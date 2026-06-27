@@ -1,0 +1,84 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: ollama
+  namespace: ollama
+spec:
+  interval: 30m
+  targetNamespace: ollama
+  chart:
+    spec:
+      chart: ollama
+      version: "1.64.0"
+      sourceRef:
+        kind: HelmRepository
+        name: otwld
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    # Run the pod under the nvidia containerd runtime (cluster default is runc).
+    runtimeClassName: nvidia
+
+    # Match this on the SidecarProfile to inject the NetBird sidecar.
+    podLabels:
+      netbird-peer: ollama
+
+    ollama:
+      gpu:
+        enabled: true
+        type: nvidia
+        number: 1
+      models:
+        # 6 GB VRAM only fits the 4B at q4_K_M with headroom for KV cache;
+        # no on-disk fallback (a smaller model wouldn't help and a bigger one
+        # would spill to CPU). Add more with `ollama pull` at runtime if needed.
+        pull:
+          - qwen3.5:4b-q4_K_M
+        run:
+          - qwen3.5:4b-q4_K_M
+
+    # Keep the 4B hot, never load a second model alongside it.
+    extraEnv:
+      - name: OLLAMA_KEEP_ALIVE
+        value: "24h"
+      - name: OLLAMA_MAX_LOADED_MODELS
+        value: "1"
+      - name: OLLAMA_NUM_PARALLEL
+        value: "1"
+
+    # Land on the GPU node (host labels via k3s extraFlags).
+    # The chart auto-adds the nvidia.com/gpu toleration when gpu.enabled is true.
+    nodeSelector:
+      gpu: "true"
+
+    # Persist model blobs across restarts. 4B+8B Q4 fits well under 30Gi.
+    # storageClass explicit because the cluster has two default StorageClasses.
+    persistentVolume:
+      enabled: true
+      size: 30Gi
+      storageClass: longhorn
+
+    service:
+      type: ClusterIP
+      port: 11434
+
+    # NetBird-only exposure; reach the pod over the mesh via the sidecar.
+    ingress:
+      enabled: false
+
+    # Model pulls can take a while; raise the readiness window.
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      failureThreshold: 60
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      periodSeconds: 30
+      failureThreshold: 6
