@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: shelfmark
-          image: ghcr.io/calibrain/shelfmark:v1.3.2
+          image: ghcr.io/calibrain/shelfmark:v1.3.3
           imagePullPolicy: Always
           # Linux 6.10+ kernels drop CONFIG_NETFILTER_XTABLES_LEGACY; the image's
           # tor.sh fails on `iptables-legacy -t filter`. Switch alternatives to nft
