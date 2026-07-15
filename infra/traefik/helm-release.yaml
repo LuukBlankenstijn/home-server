@@ -53,10 +53,9 @@ spec:
         protocol: TCP
         expose:
           default: true
-    logs:
-      access:
-        enabled: true
-        format: "json"
+    accessLog:
+      enabled: true
+      format: "json"
     providers:
       kubernetesGateway:
         enabled: true

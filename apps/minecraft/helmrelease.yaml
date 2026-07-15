@@ -37,6 +37,7 @@ spec:
 
     extraEnv:
       MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark"
+      MODRINTH_ALLOWED_VERSION_TYPE: "alpha"
 
     resources:
       requests:
