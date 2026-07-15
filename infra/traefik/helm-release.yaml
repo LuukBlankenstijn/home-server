@@ -47,6 +47,12 @@ spec:
         protocol: UDP
         expose:
           default: true
+      minecraft:
+        port: 25565
+        exposedPort: 25565
+        protocol: TCP
+        expose:
+          default: true
     logs:
       access:
         enabled: true
