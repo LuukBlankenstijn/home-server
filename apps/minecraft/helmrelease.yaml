@@ -30,6 +30,7 @@ spec:
     strategyType: RollingUpdate
 
     minecraftServer:
+      motd: "minecraft server"
       eula: "TRUE"
       type: "FABRIC"
       version: "26.2"
