@@ -40,7 +40,7 @@ spec:
       memory: "6144M"
 
     extraEnv:
-      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark"
+      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,xaeros-minimap,xaeros-world-map"
       MODRINTH_ALLOWED_VERSION_TYPE: "alpha"
 
     resources:
