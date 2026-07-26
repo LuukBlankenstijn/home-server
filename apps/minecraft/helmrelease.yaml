@@ -38,6 +38,9 @@ spec:
       serviceType: ClusterIP
       servicePort: 25565
       memory: "6144M"
+      rcon:
+        enabled: true
+        withGeneratedPassword: true
 
     extraEnv:
       MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,xaeros-minimap,xaeros-world-map"
