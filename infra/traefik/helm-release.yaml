@@ -53,6 +53,12 @@ spec:
         protocol: TCP
         expose:
           default: true
+      voicechat-udp:
+        port: 24454
+        exposedPort: 24454
+        protocol: UDP
+        expose:
+          default: true
     accessLog:
       enabled: true
       format: "json"

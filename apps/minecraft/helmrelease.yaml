@@ -41,9 +41,17 @@ spec:
       rcon:
         enabled: true
         withGeneratedPassword: true
+      extraPorts:
+        - name: voicechat
+          containerPort: 24454
+          protocol: UDP
+          service:
+            enabled: true
+            embedded: true
+            port: 24454
 
     extraEnv:
-      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,xaeros-minimap,xaeros-world-map"
+      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,xaeros-minimap,xaeros-world-map,simple-voice-chat"
       MODRINTH_ALLOWED_VERSION_TYPE: "alpha"
 
     resources:
