@@ -51,7 +51,7 @@ spec:
             port: 24454
 
     extraEnv:
-      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,simple-voice-chat"
+      MODRINTH_PROJECTS: "fabric-api,lithium,ferrite-core,krypton,c2me-fabric,spark,carpet,carpet-extra,simple-voice-chat"
       MODRINTH_ALLOWED_VERSION_TYPE: "alpha"
 
     resources:
