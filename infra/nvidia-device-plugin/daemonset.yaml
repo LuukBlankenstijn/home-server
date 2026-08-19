@@ -29,7 +29,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
         - name: nvidia-device-plugin-ctr
-          image: nvcr.io/nvidia/k8s-device-plugin:v0.19.3
+          image: nvcr.io/nvidia/k8s-device-plugin:v0.20.0
           env:
             - name: FAIL_ON_INIT_ERROR
               value: "false"
