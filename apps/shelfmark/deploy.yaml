@@ -15,14 +15,30 @@ spec:
         - name: shelfmark
           image: ghcr.io/calibrain/shelfmark:v1.3.15
           imagePullPolicy: Always
-          # Linux 6.10+ kernels drop CONFIG_NETFILTER_XTABLES_LEGACY; the image's
-          # tor.sh fails on `iptables-legacy -t filter`. Switch alternatives to nft
-          # before entrypoint. Upstream: calibrain/shelfmark#1006, #1021.
+          # Two upstream workarounds, both applied before the entrypoint runs.
+          #
+          # 1. Linux 6.10+ kernels drop CONFIG_NETFILTER_XTABLES_LEGACY; the image's
+          #    tor.sh fails on `iptables-legacy -t filter`. Switch alternatives to nft.
+          # 2. tor.sh exempts uid 100 (debian-tor) from the transparent redirect, but
+          #    the torrc it generates has no User directive, so supervisord runs tor
+          #    as root. The exemption never matches and tor's own new connections are
+          #    redirected into its own TransPort ("Are you trying to send Tor traffic
+          #    over Tor?"), killing all egress once the bootstrap circuits expire.
+          #    DataDirectory is required too, else tor drops privileges and cannot
+          #    create /root/.tor.
+          #
+          # The sed is anchored on a line tor.sh writes into its torrc heredoc. If an
+          # upstream rewrite moves that anchor the patch would silently no-op and
+          # egress would die again, so the grep turns a mismatch into a crash loop.
+          #
+          # Upstream: calibrain/shelfmark#1006, #1021.
           command: ["/bin/bash", "-c"]
           args:
             - |
               update-alternatives --set iptables /usr/sbin/iptables-nft &&
               update-alternatives --set ip6tables /usr/sbin/ip6tables-nft &&
+              sed -i '/^TransPort 9040$/i User debian-tor\nDataDirectory /var/lib/tor' /app/tor.sh &&
+              grep -q '^User debian-tor$' /app/tor.sh &&
               exec /usr/bin/dumb-init -- /app/entrypoint.sh
           ports:
             - containerPort: 8084
