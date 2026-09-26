@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: shelfmark
-          image: ghcr.io/calibrain/shelfmark:v1.3.15
+          image: ghcr.io/calibrain/shelfmark:v1.4.0
           imagePullPolicy: Always
           # Two upstream workarounds, both applied before the entrypoint runs.
           #
