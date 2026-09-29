@@ -14,6 +14,7 @@ We will run a self-hosted fleet of coding agents on the home k3s cluster, orches
 - Runtime project selection: the human names the repository when giving the lead a task. No config or deployment change per project.
 - Harness-agnostic: switching an agent from Claude Code to OpenCode is a config change.
 - Generic tooling through Nix: agents get any language toolchain via `nix shell` or the repo's own flake, without per-language images.
+- Containers inside the sandbox: agents can build and run containers with rootless Podman, so test suites that need containers (testcontainers, compose) work.
 - A browser-based interface to talk to the lead agent and watch agents work.
 - Humans stay the final gate: agents open pull requests, humans merge.
 
@@ -24,7 +25,6 @@ We will run a self-hosted fleet of coding agents on the home k3s cluster, orches
 - Agents deploying to production or merging their own work.
 - Multi-cluster or multi-tenant operation, or a reusable Helm chart for other clusters.
 - Building our own agent harness or LLM gateway.
-- Tests that need Docker (Docker-in-Docker, testcontainers).
 
 ## Architecture
 
@@ -51,7 +51,7 @@ flowchart LR
   nixcache --> cno[(cache.nixos.org)]
 ```
 
-Every agent pod runs under gVisor, has no Kubernetes API access, and can reach only the egress proxy, the Nix cache, the token broker and DNS.
+Every agent pod runs as a Kata Containers VM, has no Kubernetes API access, and can reach only the egress proxy, the Nix cache, the token broker and DNS.
 
 A task flows through the system in this order:
 
@@ -76,19 +76,25 @@ Gas City is young and the design leans on it. If phase 1 shows its Kubernetes ru
 ### Runtime and isolation
 
 - Agents run as pods created by Gas City's Kubernetes runtime.
-- Preferred isolation: [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) (Kubernetes SIG Apps), which provides a `Sandbox` CRD backed by gVisor or Kata Containers, plus warm pools.
-- Fallback if Gas City cannot create `Sandbox` resources: plain pods with a gVisor `RuntimeClass`, a per-role NetworkPolicy and per-role credentials. This gives most of the isolation benefit without the extra controller.
-- gVisor (`runsc`) is installed on the nodes through their NixOS configuration and registered with k3s's containerd. This is node configuration, not something Flux deploys. Kata is not planned: it needs nested virtualization and gVisor is sufficient.
+- Runtime: [Kata Containers](https://katacontainers.io/). Each agent pod is a lightweight VM with its own guest kernel. The nodes are bare metal, so KVM is available.
+- Kata over gVisor because agents run rootless Podman, Nix builds and arbitrary test suites. These need a real Linux kernel (user namespaces, overlayfs, cgroups), which gVisor only partly emulates. Kata also gives a hardware virtualization boundary, which is stronger than gVisor's. The cost is memory overhead and slower startup per pod, measured in phase 1.
+- Hypervisor: QEMU or Cloud Hypervisor, chosen in phase 1. Not Firecracker, since it needs the devmapper snapshotter.
+- Preferred orchestration of the sandbox: [agent-sandbox](https://github.com/kubernetes-sigs/agent-sandbox) (Kubernetes SIG Apps), which provides a `Sandbox` CRD with a Kata `RuntimeClass`, plus warm pools to hide VM startup time.
+- Fallback if Gas City cannot create `Sandbox` resources: plain pods with the Kata `RuntimeClass`, a per-role NetworkPolicy and per-role credentials.
+- Kata is installed on the nodes through their NixOS configuration and registered as a runtime with k3s's containerd, with `privileged_without_host_devices = true` so privileged settings never pass host devices into a VM. This is node configuration, not something Flux deploys.
+- gVisor stays a fallback if Kata proves unworkable, at the cost of Podman support.
 - sandbox-operator is explicitly not used; it overlaps with both of the above.
 
 ### Agent images and tooling (Nix)
 
-- One image per harness, containing only the harness, git, a git credential helper for the token broker, and Nix. No language toolchains.
+- One image per harness, containing only the harness, git, a git credential helper for the token broker, Nix, and rootless Podman. No language toolchains.
 - Images are built with Nix (`dockerTools` or nix2container) from the `agent-fleet` flake. `flake.lock` pins every version, including the harness CLIs.
 - Agents get tooling on demand: the repo's own `flake.nix` or `shell.nix` if present, otherwise ad hoc `nix shell nixpkgs#<tool>`.
 - `/nix` is a writable volume seeded from the image. The rest of the root filesystem is read-only; the workspace is a separate writable volume.
-- Nix's own build sandbox is disabled (`sandbox = false`) if it does not work under gVisor; gVisor is the isolation boundary.
+- Nix's own build sandbox stays enabled; it works inside the Kata guest kernel.
 - An in-cluster pull-through binary cache (ncps or Attic, chosen in phase 1) sits in front of cache.nixos.org, so short-lived pods do not download the same toolchains repeatedly. Packages not in the binary cache that need source downloads from other hosts fail by default; we widen this only if it proves too strict.
+- Rootless Podman runs as the agent user inside the VM, with its storage on a writable volume. It needs `/etc/subuid` and `/etc/subgid` in the image and setuid `newuidmap`/`newgidmap`, so agent pods allow privilege escalation inside the VM. The VM boundary, not the container's security context, is what isolates the agent. The exact security context is settled in phase 1.
+- Containers started by Podman share the agent pod's network namespace, so they are subject to the same NetworkPolicy and egress proxy. Image pulls go through the proxy to allowlisted registries. An in-cluster registry mirror, like the Nix cache, can come later if pulls become slow.
 - Nix provides toolchains, not project dependencies. `npm install`, `cargo fetch` and similar still need their package registries through the egress proxy.
 
 ### Agent roles
@@ -126,7 +132,7 @@ A small in-cluster service and the only component holding the GitHub App private
 
 - An allowlisting HTTP(S) forward proxy (smokescreen, Squid or Envoy, chosen in phase 1) filtering `CONNECT` by hostname. No TLS interception.
 - One allowlist per role, enforced by giving each role its own listener and letting NetworkPolicy route each role only to its listener.
-- Baseline allowlist: GitHub (`github.com`, `api.github.com`, `codeload.github.com`, `objects.githubusercontent.com`), the role's LLM provider API, and package registries for roles that install dependencies.
+- Baseline allowlist: GitHub (`github.com`, `api.github.com`, `codeload.github.com`, `objects.githubusercontent.com`), the role's LLM provider API, package registries for roles that install dependencies, and container registries (Docker Hub, GHCR, Quay) for roles that pull images.
 - The proxy's access log is the harness-independent record of every outbound connection and goes to Loki.
 
 ## Security model
@@ -135,7 +141,7 @@ Security lives in the infrastructure, not in the harness. The harness's own perm
 
 Threat to design against: prompt injection through repository content, issues, pull request comments or fetched web pages that makes an agent misuse its credentials, exfiltrate data or attack other services on the cluster or home network. Public repositories are exactly where untrusted content comes from, so this threat is the expected case, not an edge case.
 
-- **Isolation:** one pod per agent session, gVisor runtime, non-root, read-only root filesystem with writable `/nix` and workspace volumes only.
+- **Isolation:** one pod per agent session, each a Kata VM. The agent runs as a non-root user; the root filesystem is read-only, with writable `/nix`, Podman storage and workspace volumes only. Nested containers run rootless under that user.
 - **Cluster access:** `automountServiceAccountToken: false` on every agent pod, per-role ServiceAccounts with no RBAC, only the Gas City controller can create pods, and only in its own namespace.
 - **Network:** default-deny ingress and egress on the namespace. Agent pods may reach only DNS, their egress proxy listener, the Nix cache and the token broker. Explicitly no access to other namespaces (Vaultwarden, Authentik, databases, Garage), node IPs, or home LAN ranges. The Ollama service is allowed only for roles configured to use it. Allowing a broad domain such as GitHub is itself an exfiltration path, which is why token scope matters as much as egress.
 - **Credentials:** GitHub tokens come only from the token broker: one repository, role permissions, one hour. LLM API keys are one per role, stored as SealedSecrets and mounted only into that role's pods, so usage and cost are tracked per role.
@@ -252,9 +258,9 @@ Build in six phases. Each phase ends with a working, demonstrable system, and th
 0. **Observability.** Loki, Alloy and Grafana in `home-server`, Grafana behind Authentik.
    - Done when: logs from every namespace are queryable in Grafana and only the Authentik group can log in.
 1. **Spike: verify the unknowns.** Answer every item in Open questions with a short written finding and, where possible, a minimal proof of concept.
-   - Done when: each open question has an answer in `docs/findings.md`, and the isolation approach, egress proxy and Nix cache are chosen.
-2. **One agent in one pod.** Gas City with its Kubernetes runtime starts a single Claude Code agent in a gVisor pod, with the egress proxy, Nix cache, token broker and default-deny NetworkPolicy in place. A human reaches it through ttyd behind Authentik.
-   - Done when: the agent, given a public test repository at runtime, can clone it, get a toolchain with `nix shell`, make a change on an `agent/*` branch and push it; and it cannot reach a non-allowlisted domain, another namespace, a node IP or the home LAN; cannot push to the default branch; cannot get a token for a private repository, for a repository without the ruleset, or for a different repository than its task's.
+   - Done when: each open question has an answer in `docs/findings.md`, and Kata with rootless Podman is confirmed (or the gVisor fallback chosen), and the hypervisor, egress proxy and Nix cache are chosen.
+2. **One agent in one pod.** Gas City with its Kubernetes runtime starts a single Claude Code agent in a Kata pod, with the egress proxy, Nix cache, token broker and default-deny NetworkPolicy in place. A human reaches it through ttyd behind Authentik.
+   - Done when: the agent, given a public test repository at runtime, can clone it, get a toolchain with `nix shell`, run a container with rootless Podman, make a change on an `agent/*` branch and push it; and it cannot reach a non-allowlisted domain, another namespace, a node IP or the home LAN; cannot push to the default branch; cannot get a token for a private repository, for a repository without the ruleset, or for a different repository than its task's.
 3. **Lead plus coders.** The lead takes a task and a repository from the web terminal, splits it, and assigns subtasks to two coder agents in separate pods. Work is tracked in the Gas City queue.
    - Done when: a task that touches two files is completed by two coders in parallel, the lead integrates both branches and opens one pull request, and a second repository works without any deployment change.
 4. **Reviewer, tester and limits.** Add the reviewer and tester roles to the flow, the review round limit, pod deadlines and the kill switch.
@@ -270,6 +276,7 @@ Build in six phases. Each phase ends with a working, demonstrable system, and th
 - Target repository: chosen per task at runtime; onboarding a repository is only applying the ruleset.
 - GitHub identities: two Apps, `agent-writer` and `agent-reader`, with repository-scoped tokens from the token broker.
 - Tooling: Nix in every agent image, no per-language images.
+- Isolation: Kata Containers on the bare-metal nodes, with rootless Podman in every agent image. gVisor only as fallback.
 - Access: one Authentik group for ttyd and Grafana.
 - Observability: Loki, Alloy and Grafana, modelled on gewis/k8s-infra.
 - Billing: usage-based API keys, one per role.
@@ -283,7 +290,8 @@ These are unverified assumptions or undecided choices. Phase 1 answers them befo
 - [ ] How is the harness chosen per agent in `city.toml`, and which harnesses are supported today?
 - [ ] Where does Gas City keep state when running on Kubernetes (Beads on Dolt, the Kubernetes-backed providers), and what needs a PersistentVolume?
 - [ ] Does the lead's tmux session run inside the lead's pod, or in the Gas City controller? This decides where ttyd runs.
-- [ ] Does each harness, and Nix, work under gVisor? Which harness and Nix sandboxing features must be disabled inside it?
+- [ ] Kata on NixOS and k3s: which hypervisor, what memory overhead and startup time per pod, and how fast are `nix shell`, a typical build and I/O on the workspace volume?
+- [ ] Rootless Podman inside Kata: the minimal security context that works, the storage driver, and whether each harness's own sandbox works alongside it.
 - [ ] Which egress proxy (smokescreen, Squid, Envoy) and which Nix cache (ncps, Attic)?
 - [ ] Is there an existing open-source GitHub App token broker that does per-pod, per-repository token minting, or do we write one? Can it check the ruleset with read-only permissions?
 - [ ] How do the Gas City config and role prompts get into the cluster?
